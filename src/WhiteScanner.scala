@@ -32,6 +32,8 @@ package white {
 
     def g = ">" ^^ { _ => G }
 
+    def assign = "=" ^^ { _ => ASSIGN}
+
     def plus = "+" ^^ { _ => PLUS }
 
     def minus = "-" ^^ { _ => MINUS }
@@ -75,6 +77,11 @@ package white {
           sem |
           l |
           g |
+          and |
+          or |
+          xor |
+          not |
+          assign|
           plus |
           minus |
           mul |

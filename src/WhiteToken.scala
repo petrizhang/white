@@ -61,6 +61,11 @@ package white {
     override def toString: String = ">="
   }
 
+  /// 大于等于 》=
+  case object ASSIGN extends WhiteToken {
+    override def toString: String = "="
+  }
+
   /// and
   case object AND extends WhiteToken {
     override def toString: String = "and"
@@ -120,5 +125,4 @@ package white {
   case object SEM extends WhiteToken {
     override def toString: String = ";"
   }
-
 }
