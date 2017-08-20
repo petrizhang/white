@@ -32,7 +32,7 @@ package white {
 
     def g = ">" ^^ { _ => G }
 
-    def assign = "=" ^^ { _ => ASSIGN}
+    def assign = "=" ^^ { _ => ASSIGN }
 
     def plus = "+" ^^ { _ => PLUS }
 
@@ -42,11 +42,17 @@ package white {
 
     def div = "/" ^^ { _ => DIV }
 
+    def comma = "," ^^ { _ => COMMA }
+
     def if_ = "if" ^^ { _ => IF }
 
     def else_ = "else" ^^ { _ => ELSE }
 
     def while_ = "while" ^^ { _ => WHILE }
+
+    def def_ = "def" ^^ { _ => DEF }
+
+    def var_ = "var" ^^ { _ => VAR }
 
     def boolLiteral: Parser[BOOL_LITERAL] = {
       "true" ^^ { _ => BOOL_LITERAL(true) } |
@@ -81,14 +87,17 @@ package white {
           or |
           xor |
           not |
-          assign|
+          assign |
           plus |
           minus |
           mul |
           div |
+          comma |
           if_ |
           else_ |
           while_ |
+          def_ |
+          var_ |
           boolLiteral |
           numberLiteral |
           strLiteral |

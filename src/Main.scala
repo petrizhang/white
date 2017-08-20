@@ -7,38 +7,24 @@ object Main {
   def main(args: Array[String]) {
     var a =
       """
-{
-    if (a == 1 and a > b) {
-      a = 1;
-      a = a + 2;
-      c;
-    } else if(a == 2) {
-      a = 2;
-    } else if(a == 3) {
-      a = 3;
-    } else {
-      a==2;
+    def add(a,b) {
+       a+b;
     };
 
-    while(a == 2) {
-      a = 2;
+    var a = (a+b)(1,2)(3,4)(5,6);
+
+    var b = 0;
+
+    while (a > 0) {
+       a = a - 1;
+       b = b + 1;
     };
 
-}"""
 
-    var c =
-"""
-{
-if (a==1) {
-  a=1
-};
-
-while(a == 2) {
-  a = 2;
-};
-}
 """
 
+
+    val c = "(a+b)(1,2)(3,4)(5,6);"
     val before = System.currentTimeMillis()
 
     val tokens = white.WhiteScanner(a)

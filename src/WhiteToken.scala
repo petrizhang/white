@@ -125,4 +125,17 @@ package white {
   case object SEM extends WhiteToken {
     override def toString: String = ";"
   }
+
+  case object COMMA extends WhiteToken {
+    override def toString: String = ","
+  }
+
+  case object DEF extends WhiteToken {
+    override def toString: String = "def";
+  }
+
+  case object VAR extends WhiteToken {
+    override def toString: String = "var";
+  }
+
 }

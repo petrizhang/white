@@ -31,13 +31,36 @@ package white {
       }
     }
 
-    //    def module: Parser[Expr] = {
-    ////
-    ////    }
+    def module: Parser[Module] = {
+      expr_list ^^ { list => Module(list) }
+    }
 
+    def expr_list: Parser[List[Expr]] = {
+      rep(expr <~ SEM)
+    }
+
+    def func_def: Parser[FunctionDef] = {
+      DEF ~ identifier ~ L_BRACKET ~ identifier_list ~ R_BRACKET ~ block ^^ {
+        case _ ~ id ~ _ ~ id_list ~ _ ~ body => FunctionDef(id, id_list, body)
+      }
+    }
+
+    def identifier_list[List[String]] = {
+      identifier ~ rep(COMMA ~> identifier) ^^ {
+        case id ~ list => List(id) ::: list
+      } |
+        epsilon ^^ { _ => List("") }
+    }
+
+    def arg_list[List[Expr]] = {
+      expr ~ rep(COMMA ~> expr) ^^ {
+        case e ~ list => List(e) ::: list
+      } |
+        epsilon ^^ { _ => List(VoidExpr()) }
+    }
 
     def block: Parser[Expr] = {
-      L_BRACE ~ rep(expr <~ SEM) ~ R_BRACE ^^ {
+      L_BRACE ~ expr_list ~ R_BRACE ^^ {
         case _ ~ list ~ _ => Block(list)
       }
     }
@@ -105,43 +128,72 @@ package white {
       }
     }
 
-    def normal_expr: Parser[Expr] = {
-      L_BRACKET ~> expr <~ R_BRACKET |
-        identifier ~ assign_body ^^ {
-          case IDENTIFIER(name) ~ None => Variable(name)
-          case IDENTIFIER(name) ~ Some(e) => Assign(Variable(name), e)
-        } |
-        bool_literal ^^ { case BOOL_LITERAL(value) => BoolLiteral(value) } |
-        number_literal ^^ { case NUMBER_LITERAL(value) => NumberLiteral(value) } |
-        str_literal ^^ { case STR_LITERAL(value) => StringLiteral(value) } |
-        if_expr |
-        while_expr
+    def var_def: Parser[VariableDef] = {
+      VAR ~ identifier ~ opt(ASSIGN ~> expr) ^^ {
+        case _ ~ id ~ None => VariableDef(id, VoidExpr())
+        case _ ~ id ~ Some(e) => VariableDef(id, e)
+      }
     }
+
+    def normal_expr: Parser[Expr] = {
+      bool_literal ^^ { case boolean => BoolLiteral(boolean) } |
+        number_literal ^^ { case num => NumberLiteral(num) } |
+        str_literal ^^ { case str => StringLiteral(str) } |
+        if_expr |
+        while_expr |
+        func_def |
+        var_def |
+        func_call |
+        identifier ~ assign_body ^^ {
+          case name ~ None => VariableRef(name)
+          case name ~ Some(e) => AssignExpr(VariableRef(name), e)
+        } |
+        L_BRACKET ~> expr <~ R_BRACKET
+    }
+
+    def func_call: Parser[Expr] = {
+      identifier ~ rep1(L_BRACKET ~> arg_list <~ R_BRACKET) ^^ {
+        case id ~ list => {
+          val func = VariableRef(id)
+          list.foldLeft(func: Expr) {
+            (x, y) => FunctionCall(x, y)
+          }
+        }
+      } |
+        L_BRACKET ~ expr ~ R_BRACKET ~ rep1(L_BRACKET ~> arg_list <~ R_BRACKET) ^^ {
+          case _ ~ e ~ _ ~ list => {
+            list.foldLeft(e: Expr) {
+              (x, y) => FunctionCall(x, y)
+            }
+          }
+        }
+    }
+
 
     def assign_body: Parser[Option[Expr]] = {
       ASSIGN ~ expr ^^ { case _ ~ e => Some(e) } |
         epsilon ^^ { _ => None }
     }
 
-    private def identifier: Parser[IDENTIFIER] = {
-      accept("identifier", { case id@IDENTIFIER(name) => id })
+    private def identifier: Parser[String] = {
+      accept("identifier", { case IDENTIFIER(name) => name })
     }
 
-    private def str_literal: Parser[STR_LITERAL] = {
-      accept("string literal", { case lit@STR_LITERAL(value) => lit })
+    private def str_literal: Parser[String] = {
+      accept("string literal", { case STR_LITERAL(value) => value })
     }
 
-    private def bool_literal: Parser[BOOL_LITERAL] = {
-      accept("bool literal", { case lit@BOOL_LITERAL(value) => lit })
+    private def bool_literal: Parser[Boolean] = {
+      accept("bool literal", { case BOOL_LITERAL(value) => value })
     }
 
-    private def number_literal: Parser[NUMBER_LITERAL] = {
-      accept("nummber literal", { case lit@NUMBER_LITERAL(value) => lit })
+    private def number_literal: Parser[Double] = {
+      accept("nummber literal", { case NUMBER_LITERAL(value) => value })
     }
 
     def apply(tokens: Seq[WhiteToken]): Either[WhiteParsrError, WhiteAST] = {
       val reader = new WhiteTokenReader(tokens)
-      block(reader) match {
+      module(reader) match {
         case NoSuccess(msg, next) => Left(WhiteParsrError(msg))
         case Success(result, next) => Right(result)
         case x => Left(WhiteParsrError(x.toString))

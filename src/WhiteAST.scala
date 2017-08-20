@@ -10,13 +10,15 @@ package white {
 
   case class VoidExpr() extends Expr
 
-  // 变量
-  case class Variable(name: String) extends Expr {
+  // 变量引用
+  case class VariableRef(name: String) extends Expr {
     override def toString: String = s"$name"
   }
 
+  // 变量声明
+  case class VariableDef(name: String, initValue: Expr) extends Expr
   // 赋值
-  case class Assign(variable: Variable, value: Expr) extends Expr {
+  case class AssignExpr(variable: VariableRef, value: Expr) extends Expr {
     override def toString: String = s"$variable=$value"
   }
 
@@ -28,11 +30,11 @@ package white {
         (x, y) => {
           x match {
             case "" => y.toString
-            case _ => s"$x,\n$y"
+            case _ => s"$x;\n$y"
           }
         }
       }
-      s"\n{\n $str \n}\n"
+      s"\n{\n $str; \n}\n"
     }
   }
 
@@ -80,9 +82,12 @@ package white {
   }
 
   // 函数定义
-  case class FunctionDef(name: String, params: List[String], body: Expr)
+  case class FunctionDef(name: String, params: List[String], body: Expr) extends Expr
 
   // 函数调用
-  case class FunctionCall(name: String, args: List[Expr])
+  case class FunctionCall(func: Expr, args: List[Expr]) extends Expr
+
+  // 模块
+  case class Module(body: List[Expr]) extends WhiteAST
 
 }
