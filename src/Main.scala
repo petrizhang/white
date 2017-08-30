@@ -3,29 +3,26 @@ import white._
 object Main {
 
   def main(args: Array[String]) {
-    val intp = new WhiteInterpreter()
-    val bin = BinaryExpr(
-      PLUS,
-      BinaryExpr(MUL, NumberLiteral(1), NumberLiteral(2)),
-      BinaryExpr(DIV, NumberLiteral(3), NumberLiteral(4))
-    )
-    intp.visit(bin)
+    parserTest()
   }
 
-  def parserTest = {
+  def parserTest(): Unit = {
     var a =
       """
     def add(a,b) {
+       var m = 0;
        a+b;
     };
 
-    var a = (a+b)(1,2)(3,4)(5,6);
+    var a = 2;
 
     var b = 0;
 
     while (a > 0) {
+       var s = 2;
        a = a - 1;
        b = b + 1;
+       s = s + 2
     };
 """
 
@@ -36,9 +33,13 @@ object Main {
     val tokens = white.W_Scanner(a)
     println(s"tokens: $tokens")
     if (tokens.isRight) {
-      val ast = white.WhiteParser(tokens.right.get)
+      val ast = white.W_Parser(tokens.right.get)
       if (ast.isRight) {
-        println(ast.right.get)
+        val result = ast.right.get
+        println(result)
+        println("--------------------------------")
+        W_SemanticChecker.genScope(result)
+        println(result)
       } else {
         println(ast.left.get)
       }

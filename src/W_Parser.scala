@@ -15,7 +15,7 @@ package white {
     override def atEnd: Boolean = tokens.isEmpty
   }
 
-  object WhiteParser extends Parsers {
+  object W_Parser extends Parsers {
     override type Elem = W_Token
 
     def epsilon: Parser[Expr] = {
@@ -32,7 +32,7 @@ package white {
     }
 
     def module: Parser[Module] = {
-      expr_list ^^ { list => Module(list) }
+      expr_list ^^ { list => Module(list, new Scope(None)) }
     }
 
     def expr_list: Parser[List[Expr]] = {
@@ -59,9 +59,9 @@ package white {
         epsilon ^^ { _ => List(VoidExpr()) }
     }
 
-    def block: Parser[Expr] = {
+    def block: Parser[Block] = {
       L_BRACE ~ expr_list ~ R_BRACE ^^ {
-        case _ ~ list ~ _ => Block(list)
+            case _ ~ list ~ _ => Block(list, new Scope(None))
       }
     }
 
@@ -169,7 +169,6 @@ package white {
         }
     }
 
-
     def assign_body: Parser[Option[Expr]] = {
       ASSIGN ~ expr ^^ { case _ ~ e => Some(e) } |
         epsilon ^^ { _ => None }
@@ -191,12 +190,12 @@ package white {
       accept("nummber literal", { case NUMBER_LITERAL(value) => value })
     }
 
-    def apply(tokens: Seq[W_Token]): Either[W_ParsrError, W_AST] = {
+    def apply(tokens: Seq[W_Token]): Either[W_ParserError, W_AST] = {
       val reader = new W_TokenReader(tokens)
       module(reader) match {
-        case NoSuccess(msg, next) => Left(W_ParsrError(msg))
+        case NoSuccess(msg, next) => Left(W_ParserError(msg))
         case Success(result, next) => Right(result)
-        case x => Left(W_ParsrError(x.toString))
+        case x => Left(W_ParserError(x.toString))
       }
     }
   }

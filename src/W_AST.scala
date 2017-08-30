@@ -17,13 +17,14 @@ package white {
 
   // 变量声明
   case class VariableDef(name: String, initValue: Expr) extends Expr
+
   // 赋值
   case class AssignExpr(variable: VariableRef, value: Expr) extends Expr {
     override def toString: String = s"$variable=$value"
   }
 
   // 代码块
-  case class Block(block: List[Expr]) extends Expr {
+  case class Block(block: List[Expr], var scope: Scope) extends Expr {
 
     override def toString: String = {
       val str = block.foldLeft("") {
@@ -82,12 +83,12 @@ package white {
   }
 
   // 函数定义
-  case class FunctionDef(name: String, params: List[String], body: Expr) extends Expr
+  case class FunctionDef(name: String, params: List[String], body: Block) extends Expr
 
   // 函数调用
   case class FunctionCall(func: Expr, args: List[Expr]) extends Expr
 
   // 模块
-  case class Module(body: List[Expr]) extends W_AST
+  case class Module(body: List[Expr],var scope: Scope) extends W_AST
 
 }
