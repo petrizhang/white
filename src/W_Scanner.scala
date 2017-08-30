@@ -2,7 +2,7 @@ package white {
 
   import scala.util.parsing.combinator.JavaTokenParsers
 
-  object WhiteScanner extends JavaTokenParsers {
+  object W_Scanner extends JavaTokenParsers {
 
     def e = "==" ^^ { _ => E }
 
@@ -71,7 +71,7 @@ package white {
       "[a-zA-Z_][a-zA-Z0-9]*".r ^^ { str => IDENTIFIER(str) }
     }
 
-    def tokens: Parser[List[WhiteToken]] = {
+    def tokens: Parser[List[W_Token]] = {
       phrase(rep1(
         e |
           le |
@@ -105,9 +105,9 @@ package white {
       ))
     }
 
-    def apply(code: String): Either[WhiteScannerError, List[WhiteToken]] = {
+    def apply(code: String): Either[W_ScannerError, List[W_Token]] = {
       parse(tokens, code) match {
-        case NoSuccess(msg, next) => Left(WhiteScannerError(msg))
+        case NoSuccess(msg, next) => Left(W_ScannerError(msg))
         case Success(result, next) => Right(result)
       }
     }

@@ -5,10 +5,10 @@ package white {
 
   import scala.util.parsing.input.{NoPosition, Position, Reader}
 
-  class WhiteTokenReader(tokens: Seq[WhiteToken]) extends Reader[WhiteToken] {
-    override def first: WhiteToken = tokens.head
+  class W_TokenReader(tokens: Seq[W_Token]) extends Reader[W_Token] {
+    override def first: W_Token = tokens.head
 
-    override def rest: Reader[WhiteToken] = new WhiteTokenReader(tokens.tail)
+    override def rest: Reader[W_Token] = new W_TokenReader(tokens.tail)
 
     override def pos: Position = NoPosition
 
@@ -16,7 +16,7 @@ package white {
   }
 
   object WhiteParser extends Parsers {
-    override type Elem = WhiteToken
+    override type Elem = W_Token
 
     def epsilon: Parser[Expr] = {
       success(VoidExpr())
@@ -191,12 +191,12 @@ package white {
       accept("nummber literal", { case NUMBER_LITERAL(value) => value })
     }
 
-    def apply(tokens: Seq[WhiteToken]): Either[WhiteParsrError, WhiteAST] = {
-      val reader = new WhiteTokenReader(tokens)
+    def apply(tokens: Seq[W_Token]): Either[W_ParsrError, W_AST] = {
+      val reader = new W_TokenReader(tokens)
       module(reader) match {
-        case NoSuccess(msg, next) => Left(WhiteParsrError(msg))
+        case NoSuccess(msg, next) => Left(W_ParsrError(msg))
         case Success(result, next) => Right(result)
-        case x => Left(WhiteParsrError(x.toString))
+        case x => Left(W_ParsrError(x.toString))
       }
     }
   }

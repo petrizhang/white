@@ -1,10 +1,10 @@
 
 package white {
 
-  abstract class WhiteAST
+  abstract class W_AST
 
   // 表达式
-  class Expr() extends WhiteAST {
+  class Expr() extends W_AST {
     protected val typename: String = "<void>"
   }
 
@@ -54,12 +54,12 @@ package white {
   }
 
   // 二元运算
-  case class BinaryExpr(operator: WhiteToken, lhs: Expr, rhs: Expr) extends Expr {
+  case class BinaryExpr(operator: W_Token, lhs: Expr, rhs: Expr) extends Expr {
     override def toString: String = s"($operator,$lhs,$rhs)"
   }
 
   // 单目运算
-  case class UnaryExpr(operator: WhiteToken, hs: Expr) extends Expr {
+  case class UnaryExpr(operator: W_Token, hs: Expr) extends Expr {
     override def toString: String = s"($operator hs)"
   }
 
@@ -88,6 +88,6 @@ package white {
   case class FunctionCall(func: Expr, args: List[Expr]) extends Expr
 
   // 模块
-  case class Module(body: List[Expr]) extends WhiteAST
+  case class Module(body: List[Expr]) extends W_AST
 
 }

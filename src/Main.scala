@@ -1,10 +1,18 @@
-import java.time.LocalDateTime
-
 import white._
 
 object Main {
 
   def main(args: Array[String]) {
+    val intp = new WhiteInterpreter()
+    val bin = BinaryExpr(
+      PLUS,
+      BinaryExpr(MUL, NumberLiteral(1), NumberLiteral(2)),
+      BinaryExpr(DIV, NumberLiteral(3), NumberLiteral(4))
+    )
+    intp.visit(bin)
+  }
+
+  def parserTest = {
     var a =
       """
     def add(a,b) {
@@ -19,15 +27,13 @@ object Main {
        a = a - 1;
        b = b + 1;
     };
-
-
 """
 
 
     val c = "(a+b)(1,2)(3,4)(5,6);"
     val before = System.currentTimeMillis()
 
-    val tokens = white.WhiteScanner(a)
+    val tokens = white.W_Scanner(a)
     println(s"tokens: $tokens")
     if (tokens.isRight) {
       val ast = white.WhiteParser(tokens.right.get)
@@ -41,6 +47,6 @@ object Main {
     }
 
     val after = System.currentTimeMillis()
-    println(after - before,"ms")
+    println(after - before, "ms")
   }
 }
