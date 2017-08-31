@@ -78,8 +78,8 @@ package white {
   }
 
   // while表达式
-  case class WhileExpr(condition: Expr, body: Expr) extends Expr {
-    override def toString: String = s"while $condition $body"
+  case class WhileExpr(cond: Expr, body: Expr) extends Expr {
+    override def toString: String = s"while $cond $body"
   }
 
   // 函数定义

@@ -6,6 +6,24 @@ object Main {
     parserTest()
   }
 
+  def dumpTest(): Unit ={
+    val scope = new Scope(None)
+    scope.add("a")
+    scope.add("b")
+    scope.add("c")
+    val vref = VariableRef("zhang")
+    val vdef = VariableDef("zhang",StringLiteral("true"))
+    val block = Block(List(vdef,vdef,vdef),scope)
+    val bin = BinaryExpr(PLUS,block,block)
+    val una = UnaryExpr(MINUS,block)
+    val assign = AssignExpr(vref,block)
+    val ife = IfExpr(vref,block,Some(bin))
+    val whe = WhileExpr(vref,block)
+    val fdef = FunctionDef("add",List("a","b"),block)
+    val fcall = FunctionCall(vref,List(bin,vdef))
+    dump.dump(fcall)
+  }
+
   def parserTest(): Unit = {
     var a =
       """
@@ -36,10 +54,10 @@ object Main {
       val ast = white.W_Parser(tokens.right.get)
       if (ast.isRight) {
         val result = ast.right.get
-        println(result)
+        dump.dump(result)
         println("--------------------------------")
-        W_SemanticChecker.genScope(result)
-        println(result)
+        W_SemanticChecker.check(result)
+        dump.dump(result)
       } else {
         println(ast.left.get)
       }
