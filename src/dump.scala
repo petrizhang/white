@@ -2,8 +2,8 @@ package white {
 
   import java.io._
 
-  object dump {
-    val unit = "  "
+  object dumper {
+    var unit = "  "
 
     def dump(writer: PrintWriter, ast: W_AST, indent: String): Unit = {
       ast match {

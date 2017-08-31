@@ -6,74 +6,29 @@ package white {
   /// - 变量引用是否合法(变量未定义)
   /// - 变量名是否合法(函数名被覆盖)
   /// 以及生成作用域树
-  object W_SemanticChecker {
+  class W_SemanticChecker {
+    var curScope: Scope = new Scope(None)
 
-    def entry(module: Module): Unit = {
+    var occurErrors = false
 
-    }
-
+    /// 生成作用域,同时检查部分语义错误
     def check(ast: W_AST): Unit = {
-      ast match {
-        // 变量引用
-        case VariableRef(name: String) => None
-
-        // 变量声明
-        case VariableDef(name: String, initValue: Expr) => None
-
-        // 赋值
-        case AssignExpr(variable: VariableRef, value: Expr) => None
-
-        // 代码块
-        case Block(block: List[Expr], scope: Scope) => None
-
-        // 数字字面量
-        case NumberLiteral(value: Double) => None
-
-        // 字符串字面量
-        case StringLiteral(value: String) => None
-
-        // 布尔字面量
-        case BoolLiteral(value: Boolean) => None
-
-        // 二元运算
-        case BinaryExpr(operator: W_Token, lhs: Expr, rhs: Expr) => None
-
-        // 单目运算
-        case UnaryExpr(operator: W_Token, hs: Expr) => None
-
-        // 完整if表达式
-        case IfExpr(cond: Expr, body: Expr, else_body: Option[Expr]) => None
-
-        // while表达式
-        case WhileExpr(condition: Expr, body: Expr) => None
-
-        // 函数定义
-        case FunctionDef(name: String, params: List[String], body: Block) => None
-
-        // 函数调用
-        case FunctionCall(func: Expr, args: List[Expr]) => None
-
-        // 模块
-        case Module(body: List[Expr], scope: Scope) => None
-      }
-    }
-
-    /// 生成作用域,同时检查变量引用情况
-    def genScope(ast: W_AST): Unit = {
       ast match {
         case m@Module(list, scope) => {
           m.scope = this.curScope
-          list.foreach(genScope(_))
+          list.foreach(check(_))
+          this.goParent()
         }
 
         case b@Block(list, scope) => {
           this.curScope = new Scope(Some(curScope))
           b.scope = this.curScope
-          list.foreach(genScope(_))
+          list.foreach(check(_))
+          this.goParent()
         }
 
         case VariableDef(name, initValue) => {
-          genScope(initValue)
+          check(initValue)
           // 向符号表添加一个变量
           if (!this.curScope.add(name)) {
             W_Error.varReDefine(name)
@@ -81,8 +36,8 @@ package white {
         }
 
         case f@FunctionDef(name, params, body) => {
-          // 向符号表添加一个函数
-          curScope.add(name, W_Function(f))
+          // 向符号表添加此函数
+          this.curScope.add(name, W_Function(f))
           // 将参数添加到函数的作用域
           params.foreach(x => body.scope.add(x))
         }
@@ -95,46 +50,67 @@ package white {
 
         // 赋值
         case AssignExpr(variable: VariableRef, value: Expr) => {
-          genScope(value)
+          check(value)
         }
 
         // 二元运算
         case BinaryExpr(operator: W_Token, lhs: Expr, rhs: Expr) => {
-          genScope(lhs)
-          genScope(rhs)
+          check(lhs)
+          check(rhs)
         }
 
         // 单目运算
-        case UnaryExpr(operator: W_Token, hs: Expr) => genScope(hs)
+        case UnaryExpr(operator: W_Token, hs: Expr) => check(hs)
 
         // 完整if表达式
         case IfExpr(cond: Expr, body: Expr, else_body: Option[Expr]) => {
-          genScope(cond)
-          genScope(body)
+          check(cond)
+          check(body)
           if (else_body.isDefined) {
-            genScope(else_body.get)
+            check(else_body.get)
           }
         }
 
         // while表达式
         case WhileExpr(condition: Expr, body: Expr) => {
-          genScope(condition)
-          genScope(body)
+          check(condition)
+          check(body)
         }
 
         // 函数调用
-        case FunctionCall(func: Expr, args: List[Expr]) => args.foreach(genScope(_))
+        case FunctionCall(func: Expr, args: List[Expr]) => {
+          check(func)
+          // 检查参数
+          func match {
+            case VariableRef(name: String) => {
+              val value = curScope.get(name).get
+              value match {
+                case W_Function(fdef) => {
+                  val expect = fdef.params.length
+                  val given = args.length
+                  if (expect != given) {
+                    W_Error.wrongParams(name, expect, given)
+                  }
+                }
+                case _ => None
+              }
+            }
+            case _ => None
+          }
+          args.foreach(check(_))
+        }
 
-        case _ => return
+        case _ => None
       }
+    }
 
+    def goParent(): Unit = {
       val parent = this.curScope.getParent()
       if (parent.isDefined) {
         this.curScope = parent.get
       }
     }
-
-    var curScope: Scope = new Scope(None)
   }
+
 
 }
