@@ -62,12 +62,13 @@ package white {
     def genScope(ast: W_AST): Unit = {
       ast match {
         case m@Module(list, scope) => {
-          m.scope = curScope
+          m.scope = this.curScope
           list.foreach(genScope(_))
         }
 
-        case Block(list, scope) => {
+        case b@Block(list, scope) => {
           this.curScope = new Scope(Some(curScope))
+          b.scope = this.curScope
           list.foreach(genScope(_))
         }
 
@@ -82,7 +83,8 @@ package white {
         case f@FunctionDef(name, params, body) => {
           // 向符号表添加一个函数
           curScope.add(name, W_Function(f))
-          params.foreach(x => body.scope.add(name))
+          // 将参数添加到函数的作用域
+          params.foreach(x => body.scope.add(x))
         }
 
         case VariableRef(name) => {

@@ -29,6 +29,7 @@ package white {
 
   case class W_Function(ivalue: FunctionDef) extends W_Primitive{
     override val valueType: Int = W_Type.TypeFunction
+    override def toString = "W_Function"
   }
 
 }

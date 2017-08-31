@@ -40,7 +40,7 @@ object Main {
        var s = 2;
        a = a - 1;
        b = b + 1;
-       s = s + 2
+       s = s + 2;
     };
 """
 
@@ -48,7 +48,7 @@ object Main {
     val c = "(a+b)(1,2)(3,4)(5,6);"
     val before = System.currentTimeMillis()
 
-    val tokens = white.W_Scanner(a)
+    val tokens = white.W_Scanner(c)
     println(s"tokens: $tokens")
     if (tokens.isRight) {
       val ast = white.W_Parser(tokens.right.get)
@@ -56,7 +56,7 @@ object Main {
         val result = ast.right.get
         dump.dump(result)
         println("--------------------------------")
-        W_SemanticChecker.check(result)
+        W_SemanticChecker.genScope(result)
         dump.dump(result)
       } else {
         println(ast.left.get)
