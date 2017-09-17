@@ -36,7 +36,7 @@ Below is sample code and it's AST output:
     };
 ```
 
-```json
+```js
 *ast.Module (len=6) {
   scope:{
     add -> W_Function
