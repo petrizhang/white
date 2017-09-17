@@ -12,7 +12,7 @@ You could get the ast output for valid code by white parser now.
 
 Below is sample code and it's AST output:
 
-```
+```python
     def add(a,b) {
        def temp(c){
          a+b+c;
@@ -36,7 +36,7 @@ Below is sample code and it's AST output:
     };
 ```
 
-```
+```json
 *ast.Module (len=6) {
   scope:{
     add -> W_Function
