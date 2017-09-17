@@ -4,9 +4,7 @@ package white {
   abstract class W_AST
 
   // 表达式
-  class Expr() extends W_AST {
-    protected val typename: String = "<void>"
-  }
+  class Expr extends W_AST
 
   case class VoidExpr() extends Expr
 

@@ -3,10 +3,27 @@ import white._
 object Main {
 
   def main(args: Array[String]) {
-    parserTest()
+
+    var code =
+      """
+def a(a,b){
+  a+b;
+};
+a(1,2) == 3;
+a("z","h") == "zh";
+    """
+    class x(ivalue:Int){
+      var value:Int = ivalue
+    }
+
+   testParser()
   }
 
-  def dumpTest(): Unit = {
+  def testJavaAPI(): Unit = {
+    JavaAPI.load()
+  }
+
+  def testDumper(): Unit = {
     val scope = new Scope(None)
     scope.add("a")
     scope.add("b")
@@ -24,7 +41,7 @@ object Main {
     dumper.dump(fcall)
   }
 
-  def parserTest(): Unit = {
+  def testParser(): Unit = {
     var a =
       """
     def add(a,b) {
