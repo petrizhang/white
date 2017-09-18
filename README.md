@@ -6,7 +6,7 @@ White's design goal is to be a modern and flexible script lauguage.
 
 I'm inspired by several excellent language like scala,ocaml and ruby to improve this language continuously. 
 
-Currently, white's development is staying on parser stage and has a simple semantic checker, because the language features are not fix yet. I'll exploreto choose the best way to implement white's kernel features such as OO, concurrency, invoking scala naturely...
+Currently, white's development is staying on parser stage and has a simple semantic checker, because the language features are not fix yet. I'll explore to choose the best way to implement white's kernel features such as OO, concurrency, invoking scala naturely...
 
 With the parser and simple semantic checker completed now, you could get the AST and variables scope output for valid code.
 
@@ -145,3 +145,4 @@ AST:
 
 ### Flexible lexical scope
 
+### First class function
